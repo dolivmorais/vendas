@@ -80,8 +80,33 @@ for i in df["Equipe"].unique():
 
 #======== layout ===========
 app.layout = dbc.Container(children=[
+    # linhha 1
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dbc.Row([
+                        dbc.Col([
+                                html.I(className='fa fa-balance-scale', style={'font-size': '300%'}),
+                                ]),
+                        dbc.Col([
+                                html.Legend("Sales Analysis")
+                                ], sm=12)
+                            ]),
+                    dbc.Row([
+                        dbc.Col([
+                            ThemeSwitchAIO(aio_id="theme", themes=[url_theme1, url_theme2]),
+                            html.Legend("Dom")
+                        ])
+                    ],style={'margin-top': '10px'}),
+                    dbc.Row([
+                        dbc.Button("Visite meu perfil no Linkedin", href="https://www.linkedin.com/in/oliveiradm/",  target="_blank")
+                    ], style={'margin-top': '10px'}),
+                ], style=tab_card)])
+        ],sm=4,lg=4)
+    ]),
 
-    ], fluid=True, style={'height': '100vh'})
+        ], fluid=True, style={'height': '100vh'})
 
 #======== callbacks ========
 

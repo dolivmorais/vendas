@@ -65,8 +65,6 @@ df.loc[df['Status de Pagamento'] == 'Não pago', 'Status de Pagamento'] = '0'
 df['Status de Pagamento'] = df['Status de Pagamento'].astype('int64')
 
 
-
-
 #criando opções pros filtros
 options_month = [{'label': 'Ano todo', 'Value': 0}]
 for i, j in zip(df_cru["Mês"].unique(), df["Mês"].unique()):
@@ -86,27 +84,67 @@ app.layout = dbc.Container(children=[
             dbc.Card([
                 dbc.CardBody([
                     dbc.Row([
-                        dbc.Col([
-                                html.I(className='fa fa-balance-scale', style={'font-size': '300%'}),
-                                ]),
-                        dbc.Col([
-                                html.Legend("Sales Analysis")
-                                ], sm=12)
-                            ]),
+                        dbc.Col([  
+                            html.Legend("Sales Analytics")
+                        ], sm=8),
+                        dbc.Col([        
+                            html.I(className='fa fa-balance-scale', style={'font-size': '300%'})
+                        ], sm=4, align="center")
+                    ]),
                     dbc.Row([
                         dbc.Col([
                             ThemeSwitchAIO(aio_id="theme", themes=[url_theme1, url_theme2]),
-                            html.Legend("Dom")
+                            html.Legend("Diego Morais")
                         ])
-                    ],style={'margin-top': '10px'}),
-                    dbc.Row([
-                        dbc.Button("Visite meu perfil no Linkedin", href="https://www.linkedin.com/in/oliveiradm/",  target="_blank")
                     ], style={'margin-top': '10px'}),
-                ], style=tab_card)])
-        ],sm=4,lg=4)
-    ]),
+                    dbc.Row([
+                        dbc.Button("Visite perfil no Linkedin", href="https://www.linkedin.com/in/oliveiradm/", target="_blank")
+                    ], style={'margin-top': '10px'})
+                ])
+            ], style=tab_card)
+        ], sm=4, lg=2),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dbc.Row(
+                        dbc.Col(
+                            html.Legend('Top Consultores por Equipe')
+                        )
+                    ),
+                    dbc.Row([
+                        dbc.Col([
+                            dcc.Graph(id='graph1', className='dbc', config=config_graph)
+                        ], sm=12, md=7),
+                        dbc.Col([
+                            dcc.Graph(id='graph2', className='dbc', config=config_graph)
+                        ], sm=12, lg=5)
+                    ])
+                ])
+            ], style=tab_card)
+        ], sm=12, lg=7),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dbc.Row(
+                        dbc.Col([
+                            html.H5('Escolha o Mês'),
+                            dbc.RadioItems(
+                                id="radio-month",
+                                options=options_month,
+                                value=0,
+                                inline=True,
+                                labelCheckedClassName="text-success",
+                                inputCheckedClassName="border border-success bg-success",
+                            ),
+                            html.Div(id='month-select', style={'text-align': 'center', 'margin-top': '30px'}, className='dbc')
+                        ])
+                    )
+                ])
+            ], style=tab_card)
+        ], sm=12, lg=3)
+    ], className='g-2 my-auto', style={'margin-top': '7px'})
+    ], fluid=True, style={'height': '100vh'})
 
-        ], fluid=True, style={'height': '100vh'})
 
 #======== callbacks ========
 

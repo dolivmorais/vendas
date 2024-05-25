@@ -172,7 +172,7 @@ fig7.add_trace(go.Indicator(
     value=df7['Valor Pago'].iloc[0],
     number={'prefix': "R$ "},
     delta={'relative': True, 'valueformat': '.1%', 'reference': df7['Valor Pago'].mean()}
-)
+))
 
 fig7.show()
 #%%

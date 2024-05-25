@@ -232,146 +232,135 @@ def update_graphs(month, toggle):
 
     return fig1, fig2, select
 
- ======== Callbacks ========== #
-# Graph 1 and 2
+# callback para linha 2
 @app.callback(
-    Output('graph1', 'figure'),
-    Output('graph2', 'figure'),
-    Output('month-select', 'children'),
-    Input('radio-month', 'value'),
-    Input(ThemeSwitchAIO.ids.switch("theme"), "value")
-)
-def graph1(month, toggle):
-    template = template_theme1 if toggle else template_theme2
-
-    mask = month_filter(month)
-    df_1 = df.loc[mask]
-
-    df_1 = df_1.groupby(['Equipe', 'Consultor'])['Valor Pago'].sum()
-    df_1 = df_1.sort_values(ascending=False)
-    df_1 = df_1.groupby('Equipe').head(1).reset_index()
-
-    fig2 = go.Figure(go.Pie(labels=df_1['Consultor'] + ' - ' + df_1['Equipe'], values=df_1['Valor Pago'], hole=.6))
-    fig1 = go.Figure(go.Bar(x=df_1['Consultor'], y=df_1['Valor Pago'], textposition='auto', text=df_1['Valor Pago']))
-    fig1.update_layout(main_config, height=200, template=template)
-    fig2.update_layout(main_config, height=200, template=template, showlegend=False)
-
-    select = html.H1(convert_to_text(month))
-
-    return fig1, fig2, select
-
-# Graph 3
-@app.callback(
-    Output('graph3', 'figure'),
-    Input('radio-team', 'value'),
-    Input(ThemeSwitchAIO.ids.switch("theme"), "value")
+    Output('graph3', 'figure'), 
+    [Input('radio-team', 'value'), 
+     Input(ThemeSwitchAIO.ids.switch("theme"), "value")]
 )
 def graph3(team, toggle):
     template = template_theme1 if toggle else template_theme2
 
     mask = team_filter(team)
-    df_3 = df.loc[mask]
+    df_filtered = df[mask]
+    df2 = df.groupby("Dia")['Chamadas Realizadas'].mean().reset_index()
 
-    df_3 = df_3.groupby('Dia')['Chamadas Realizadas'].sum().reset_index()
-    fig3 = go.Figure(go.Scatter(
-    x=df_3['Dia'], y=df_3['Chamadas Realizadas'], mode='lines', fill='tonexty'))
-    fig3.add_annotation(text='Chamadas Médias por dia do Mês',
-        xref="paper", yref="paper",
-        font=dict(
-            size=17,
-            color='gray'
-            ),
-        align="center", bgcolor="rgba(0,0,0,0.8)",
-        x=0.05, y=0.85, showarrow=False)
-    fig3.add_annotation(text=f"Média : {round(df_3['Chamadas Realizadas'].mean(), 2)}",
-        xref="paper", yref="paper",
-        font=dict(
-            size=20,
-            color='gray'
-            ),
-        align="center", bgcolor="rgba(0,0,0,0.8)",
-        x=0.05, y=0.55, showarrow=False)
+    fig3 = go.Figure(
+        go.Scatter(
+            x=df2['Dia'],
+            y=df2['Chamadas Realizadas'],
+            mode='lines',
+            fill='tozeroy',
+            name='Chamadas por dia'
+        )
+    )
+
+    fig3.add_annotation(text='Media de chamadas por dia',
+                        xref='paper',yref='paper',
+                        font=dict(size=20, color='gray'),
+                        align="center", bgcolor="rgba(0,0,0,0.8)",
+                        x=0.05, y=0.85, showarrow=False)
+
+    fig3.add_annotation(text=f"Media: {round(df2["Chamadas Realizadas"].mean(),2)}",
+                        xref='paper',yref='paper',
+                        font=dict(size=20, color='gray'),
+                        align='center', bgcolor="rgba(0,0,0,0.8)",
+                        x=0.05, y=0.55, showarrow=False)
 
     fig3.update_layout(main_config, height=180, template=template)
+
+
     return fig3
 
-# Graph 4
 @app.callback(
-    Output('graph4', 'figure'),
-    Input('radio-team', 'value'),
-    Input(ThemeSwitchAIO.ids.switch("theme"), "value")
+    Output('graph4', 'figure'), 
+    [Input('radio-team', 'value'), 
+     Input(ThemeSwitchAIO.ids.switch("theme"), "value")]
 )
 def graph4(team, toggle):
     template = template_theme1 if toggle else template_theme2
-    
+
     mask = team_filter(team)
-    df_4 = df.loc[mask]
+    df4 = df.groupby("Mês")["Chamadas Realizadas"].sum().reset_index()
 
-    df_4 = df_4.groupby('Mês')['Chamadas Realizadas'].sum().reset_index()
-    fig4 = go.Figure(go.Scatter(x=df_4['Mês'], y=df_4['Chamadas Realizadas'], mode='lines', fill='tonexty'))
+    fig4 = go.Figure(
+            go.Scatter(x=df4['Mês'],y=df4['Chamadas Realizadas'],mode='lines',fill='tozeroy',name='Chamadas por mes')
+    )
 
-    fig4.add_annotation(text='Chamadas Médias por Mês',
-        xref="paper", yref="paper",
-        font=dict(
-            size=15,
-            color='gray'
-            ),
-        align="center", bgcolor="rgba(0,0,0,0.8)",
-        x=0.05, y=0.85, showarrow=False)
-    fig4.add_annotation(text=f"Média : {round(df_4['Chamadas Realizadas'].mean(), 2)}",
-        xref="paper", yref="paper",
-        font=dict(
-            size=20,
-            color='gray'
-            ),
-        align="center", bgcolor="rgba(0,0,0,0.8)",
-        x=0.05, y=0.55, showarrow=False)
+    fig4.add_annotation(text='Media de chamadas por Mês',
+                        xref='paper',yref='paper',
+                        font=dict(size=20, color='gray'),
+                        align="center", bgcolor="rgba(0,0,0,0.8)",
+                        x=0.05, y=0.85, showarrow=False)
+
+    fig4.add_annotation(text=f"Media: {round(df4["Chamadas Realizadas"].mean(),2)}",
+                        xref='paper',yref='paper',
+                        font=dict(size=20, color='gray'),
+                        align='center', bgcolor="rgba(0,0,0,0.8)",
+                        x=0.05, y=0.55, showarrow=False)
 
     fig4.update_layout(main_config, height=180, template=template)
+
     return fig4
 
-# Indicators 1 and 2 ------ Graph 5 and 6
+# indicadores 5 e 6 graph 5 e 6
 @app.callback(
-    Output('graph5', 'figure'),
-    Output('graph6', 'figure'),
-    Input('radio-month', 'value'),
-    Input(ThemeSwitchAIO.ids.switch("theme"), "value")
+    [Output('graph5', 'figure'),
+     Output('graph6', 'figure')],  
+    [Input('radio-team', 'value'), 
+     Input(ThemeSwitchAIO.ids.switch("theme"), "value")]
 )
-def graph5(month, toggle):
+def graph5(team, toggle):
     template = template_theme1 if toggle else template_theme2
 
-    mask = month_filter(month)
-    df_5 = df_6 = df.loc[mask]
-    
-    df_5 = df_5.groupby(['Consultor', 'Equipe'])['Valor Pago'].sum()
-    df_5.sort_values(ascending=False, inplace=True)
-    df_5 = df_5.reset_index()
-    fig5 = go.Figure()
-    fig5.add_trace(go.Indicator(mode='number+delta',
-        title = {"text": f"<span>{df_5['Consultor'].iloc[0]} - Top Consultant</span><br><span style='font-size:70%'>Em vendas - em relação a média</span><br>"},
-        value = df_5['Valor Pago'].iloc[0],
-        number = {'prefix': "R$"},
-        delta = {'relative': True, 'valueformat': '.1%', 'reference': df_5['Valor Pago'].mean()}
-    ))
+    mask = team_filter(team)
+    df5 = dg6 = df.loc[mask]
 
-    df_6 = df_6.groupby('Equipe')['Valor Pago'].sum()
-    df_6.sort_values(ascending=False, inplace=True)
-    df_6 = df_6.reset_index()
+    df5 = df.groupby(["Consultor", "Equipe"])["Valor Pago"].sum()
+    df5.sort_values(ascending=False, inplace=True)
+    df5 = df5.reset_index()  # Corrigido para reatribuir o resultado
+
+    # Criação do gráfico
+    fig5 = go.Figure()
+
+    fig5.add_trace(go.Indicator(
+        mode='number+delta',
+        title={
+            'text': f"<span style='font-size:70%'>{df5['Consultor'].iloc[0]} - Top Consultant</span><br>"
+                    f"<span style='font-size:50%'>Em vendas - em relação a média</span><br>"
+        },
+        value=df5['Valor Pago'].iloc[0],
+        number={'prefix': "R$ "},
+        delta={'relative': True, 'valueformat': '.1%', 'reference': df5['Valor Pago'].mean()}
+    ))
+    # Melhor Equipe
+    df6 = df.groupby("Equipe")["Valor Pago"].sum()
+    df6.sort_values(ascending=False, inplace=True)
+    df6 = df6.reset_index()  # Corrigido para reatribuir o resultado
+
+    # Criação do gráfico
     fig6 = go.Figure()
-    fig6.add_trace(go.Indicator(mode='number+delta',
-        title = {"text": f"<span>{df_6['Equipe'].iloc[0]} - Top Team</span><br><span style='font-size:70%'>Em vendas - em relação a média</span><br>"},
-        value = df_6['Valor Pago'].iloc[0],
-        number = {'prefix': "R$"},
-        delta = {'relative': True, 'valueformat': '.1%', 'reference': df_6['Valor Pago'].mean()}
+
+    fig6.add_trace(go.Indicator(
+        mode='number+delta',
+        title={
+            'text': f"<span style='font-size:70%'>{df6['Equipe'].iloc[0]} - Top Equipe</span><br>"
+                    f"<span style='font-size:50%'>Em vendas - em relação a média</span><br>"
+        },
+        value=df6['Valor Pago'].iloc[0],
+        number={'prefix': "R$ "},
+        delta={'relative': True, 'valueformat': '.1%', 'reference': df6['Valor Pago'].mean()}
     ))
 
     fig5.update_layout(main_config, height=200, template=template)
     fig6.update_layout(main_config, height=200, template=template)
-    fig5.update_layout({"margin": {"l":0, "r":0, "t":20, "b":0}})
-    fig6.update_layout({"margin": {"l":0, "r":0, "t":20, "b":0}})
+    fig5.update_layout({"margin": {"t": 0, "b": 0, "l": 50, "r": 0}})
+    fig6.update_layout({"margin": {"t": 0, "b": 0, "l": 50, "r": 0}})
+
+
     return fig5, fig6
 
-# Graph 7
+# graph 7
 @app.callback(
     Output('graph7', 'figure'),
     Input(ThemeSwitchAIO.ids.switch("theme"), "value")
@@ -389,9 +378,9 @@ def graph7(toggle):
     fig7.update_layout({"legend": {"yanchor": "top", "y":0.99, "font" : {"color":"white", 'size': 10}}})
     return fig7
 
-# Graph 8
+# graph 8
 @app.callback(
-    Output('graph8', 'figure'),
+    Output('graph8', 'figure'),  
     Input('radio-month', 'value'),
     Input(ThemeSwitchAIO.ids.switch("theme"), "value")
 )
@@ -399,21 +388,25 @@ def graph8(month, toggle):
     template = template_theme1 if toggle else template_theme2
 
     mask = month_filter(month)
-    df_8 = df.loc[mask]
+    df8 = df.loc[mask]
 
-    df_8 = df_8.groupby('Equipe')['Valor Pago'].sum().reset_index()
+
+    df8 = df.groupby('Equipe')['Valor Pago'].sum().reset_index()
+
     fig8 = go.Figure(go.Bar(
-        x=df_8['Valor Pago'],
-        y=df_8['Equipe'],
-        orientation='h',
-        textposition='auto',
-        text=df_8['Valor Pago'],
-        insidetextfont=dict(family='Times', size=12)))
+    x=df8['Valor Pago'],
+    y=df8['Equipe'],
+    orientation="h",
+    textposition="auto",
+    text=df8['Valor Pago'],
+    insidetextfont=dict(family='Times', size=12),
+    )
+)
 
     fig8.update_layout(main_config, height=360, template=template)
+
     return fig8
 
-# Graph 9
 @app.callback(
     Output('graph9', 'figure'),
     Input('radio-month', 'value'),
@@ -424,20 +417,19 @@ def graph9(month, team, toggle):
     template = template_theme1 if toggle else template_theme2
 
     mask = month_filter(month)
-    df_9 = df.loc[mask]
+    df9 = df.loc[mask]
 
     mask = team_filter(team)
-    df_9 = df_9.loc[mask]
+    df9 = df9.loc[mask]
 
-    df_9 = df_9.groupby('Meio de Propaganda')['Valor Pago'].sum().reset_index()
+    df9_group = df.groupby("Mês")["Valor Pago"].sum().reset_index()
 
     fig9 = go.Figure()
-    fig9.add_trace(go.Pie(labels=df_9['Meio de Propaganda'], values=df_9['Valor Pago'], hole=.7))
+    fig9.add_trace(go.Pie(labels=df9['Meio de Propaganda'], values=df9['Valor Pago'], hole=.7))
 
     fig9.update_layout(main_config, height=150, template=template, showlegend=False)
     return fig9
 
-# Graph 10
 @app.callback(
     Output('graph10', 'figure'),
     Input('radio-team', 'value'),
@@ -447,15 +439,14 @@ def graph10(team, toggle):
     template = template_theme1 if toggle else template_theme2
     
     mask = team_filter(team)
-    df_10 = df.loc[mask]
+    df10 = df.loc[mask]
 
-    df10 = df_10.groupby(['Meio de Propaganda', 'Mês'])['Valor Pago'].sum().reset_index()
+    df10 = df10.groupby(['Meio de Propaganda', 'Mês'])['Valor Pago'].sum().reset_index()
     fig10 = px.line(df10, y="Valor Pago", x="Mês", color="Meio de Propaganda")
 
     fig10.update_layout(main_config, height=200, template=template, showlegend=False)
     return fig10
 
-# Graph 11
 @app.callback(
     Output('graph11', 'figure'),
     Output('team-select', 'children'),
@@ -484,7 +475,8 @@ def graph11(month, team, toggle):
 
     return fig11, select
 
+# callback para linha 3
 
-# Run server
-if __name__ == '__main__':
-    app.run_server(debug=False)
+# ======== RUN APP ==========
+if __name__ == "__main__":
+    app.run_server(debug=True)
